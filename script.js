@@ -2,6 +2,7 @@ const noteInput = document.getElementById("noteInput");
 const addNoteBtn = document.getElementById("addNoteBtn");
 const notesGrid = document.getElementById("notesGrid");
 const searchInput = document.getElementById("searchInput");
+const darkModeBtn = document.getElementById("darkModeBtn"); // single reference
 
 let notes = JSON.parse(localStorage.getItem("ultimateNotes")) || [];
 
@@ -11,47 +12,45 @@ function saveNotes() {
 
 function renderNotes(filter = "") {
     notesGrid.innerHTML = "";
-    const filteredNotes = notes.filter(note =>
-    note.toLowerCase().includes(filter.toLowerCase())
-);
 
-if (filteredNotes.length === 0 && filter.trim() !== "") {
-    notesGrid.innerHTML = `<p style="text-align:center; margin-top:20px; color:#777;">
-        No notes found matching "${filter}"
-    </p>`;
-    return;
-}
-    notes
-        .filter(note => note.toLowerCase().includes(filter.toLowerCase()))
-        .forEach((note, index) => {
+    // Store original indices alongside filtered notes
+    const filteredNotes = notes
+        .map((note, index) => ({ note, index }))
+        .filter(({ note }) => note.toLowerCase().includes(filter.toLowerCase()));
 
-            const card = document.createElement("div");
-            card.className = "note-card";
+    if (filteredNotes.length === 0 && filter.trim() !== "") {
+        notesGrid.innerHTML = `<p style="text-align:center; margin-top:20px; color:#777;">
+            No notes found matching "${filter}"
+        </p>`;
+        return;
+    }
 
-            const content = document.createElement("p");
-            content.textContent = note;
+    filteredNotes.forEach(({ note, index }) => {
+        const card = document.createElement("div");
+        card.className = "note-card";
 
-            const actions = document.createElement("div");
-            actions.className = "card-actions";
+        const content = document.createElement("p");
+        content.textContent = note;
 
-            const editBtn = document.createElement("button");
-            editBtn.textContent = "Edit";
-            editBtn.className = "edit-btn";
-            editBtn.onclick = () => editNote(index);
+        const actions = document.createElement("div");
+        actions.className = "card-actions";
 
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "Delete";
-            deleteBtn.className = "delete-btn";
-            deleteBtn.onclick = () => deleteNote(index);
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.className = "edit-btn";
+        editBtn.onclick = () => editNote(index); // now uses original index
 
-            actions.appendChild(editBtn);
-            actions.appendChild(deleteBtn);
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.onclick = () => deleteNote(index); // now uses original index
 
-            card.appendChild(content);
-            card.appendChild(actions);
-
-            notesGrid.appendChild(card);
-        });
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+        card.appendChild(content);
+        card.appendChild(actions);
+        notesGrid.appendChild(card);
+    });
 }
 
 function addNote() {
@@ -79,8 +78,19 @@ function editNote(index) {
 }
 
 addNoteBtn.addEventListener("click", addNote);
-searchInput.addEventListener("input", () => {
-    renderNotes(searchInput.value);
+searchInput.addEventListener("input", () => renderNotes(searchInput.value));
+
+// ✅ Single, clean dark mode block
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-mode");
+    darkModeBtn.textContent = "☀️ Light Mode";
+}
+
+darkModeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    darkModeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
 });
 
 renderNotes();

@@ -142,3 +142,27 @@ body {
     background: #ea4335;
     color: white;
 }
+.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+.dark-mode .sidebar {
+    background-color: #1e1e1e;
+}
+
+.dark-mode .main {
+    background-color: #181818;
+}
+
+.dark-mode input,
+.dark-mode textarea {
+    background-color: #2a2a2a;
+    color: white;
+    border: none;
+}
+
+.dark-mode button {
+    background-color: #333;
+    color: white;
+}
