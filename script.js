@@ -3,6 +3,7 @@ const addNoteBtn = document.getElementById("addNoteBtn");
 const notesGrid = document.getElementById("notesGrid");
 const searchInput = document.getElementById("searchInput");
 const trashGrid = document.getElementById("trashGrid");
+const darkModeBtn = document.getElementById("darkModeBtn");
 let trash = JSON.parse(localStorage.getItem("ultimateTrash")) || [];
 let notes = JSON.parse(localStorage.getItem("ultimateNotes")) || [];
 
@@ -139,7 +140,19 @@ function renderTrash() {
         card.appendChild(actions);
         trashGrid.appendChild(card);
     });
+    
 }
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-mode");
+    darkModeBtn.textContent = "☀️ Light Mode";
+   }
+
+darkModeBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    darkModeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+});
 renderNotes();
 renderTrash();
 
